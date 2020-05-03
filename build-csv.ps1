@@ -28,7 +28,7 @@ if($null -ne $errVar){
 }
 
 $Tot = $srcPaths.Count
-$csv = @()
+$csv = [System.Collections.ArrayList]@()
 $c = 1
 $srcPaths | %{
     Write-Progress  -Activity "Processing $($_.FullName)" -PercentComplete (100 * ($c / $Tot)) -Status "Creating desitnation paths..."
@@ -36,7 +36,7 @@ $srcPaths | %{
         Source = $_.FullName
         Destination = $_.FullName.Replace($src,$dst)
     }
-    $csv += $record
+    $csv.Add($record)
     $c++
 }
 write-host "Exporting to $outFile..." -ForegroundColor Yellow
