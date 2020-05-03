@@ -28,12 +28,9 @@ Function AddToLog {
 $ErrorLog = ".\Check-Files-Error.log"
 
 # Strip trailing '\' if it is passed along
-if($src.Substring($src.Length -1) -eq "\"){
-    $src = $src.Substring(0,$src.Length -1)
-}
-if($dst.Substring($dst.Length -1) -eq "\"){
-    $dst = $dst.Substring(0,$dst.Length -1)
-}
+if($src.EndsWith("\")){ $src = $src.Substring(0,$src.Length -1) }
+if($dst.EndsWith("\")){ $dst = $dst.Substring(0,$dst.Length -1) }
+
 
 write-host "Gathering Source Paths..." -ForegroundColor Yellow
 $srcPaths = gci $src -Recurse -ErrorVariable +ErrVar -ErrorAction SilentlyContinue
@@ -54,14 +51,22 @@ if($srcPaths.Count -ne $dstPaths.Count){
     write-host "Destination   : $($dstPaths.Count)" -ForegroundColor Red
     $Diff = $srcPaths.Count - $dstPaths.Count
     write-host "Missing files : $Diff" -ForegroundColor Red
+    Exit
 } else {
     write-host "File counts of Source and Destination match!" -ForegroundColor Green
 }
 
+.\acl-check.ps1 -src $src -dst $dst -SampleSize $SampleSize
 
-# Check file Hashes 
+
+<# Check file Hashes
+
+# No longer needed as Acl-Check.ps1 does just that...
+
 $LogObj = @()
+
 $SampleSet = $srcPaths | Get-Random -Count $SampleSize
+
 $c = 1
 foreach($file in $SampleSet){
     Write-Progress  -Activity "Processing $($file.FullName)" -PercentComplete (100 * ($c / $SampleSet.Count)) -Status "Comparing file hashes of $($SampleSet.Count) paths..."
@@ -87,4 +92,4 @@ if($Null -ne $OutCsv){
 } else {
     write-host "No exception found, the SHA256 checksum of all $sampleSize sampled files matched." -ForegroundColor Green
 }
-
+#>
