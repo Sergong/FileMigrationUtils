@@ -15,13 +15,14 @@ $csv = Import-Csv $CsvPath
 $LogObj = @()
 $Tot = $csv.Count
 if($SampleSize -gt $Tot){
-    write-host "SampleSize is larger than the total nr of entries in $resultFile. The larger the SampleSize the larger the chance there will be duplicates. Exiting..." -ForegroundColor Red
-    Exit
+    write-host "SampleSize is larger than the total nr of entries in $resultFile. The setting it to $Tot."
+    $SampleSet = $csv
+} else {
+    # Build a Sample Set 
+    $SampleSet = $csv | Get-Random -Count $SampleSize
 }
 
-# Build a Sample Set 
-$SampleSet = $csv | Get-Random -Count $SampleSize
-
+# Iterate through the Set
 $c = 1
 $SampleSet | %{
     Write-Progress -Activity "Processing $($_.source)" -PercentComplete (100 * ($c / $SampleSize)) -Status "Comparing Source and Destination ACLs"
