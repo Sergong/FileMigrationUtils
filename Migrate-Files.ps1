@@ -5,15 +5,14 @@ param(
     [Parameter(Mandatory=$true)]
     $src,
     [Parameter(Mandatory=$true)]
-    $dest
+	$dest,
+	$max_jobs = 2
 )
 # Strip trailing \
 if($src.EndsWith("\")){ $src = $src.Substring(0,$src.Length -1) }
 if($dest.EndsWith("\")){ $dest = $dest.Substring(0,$dest.Length -1) }
 
 $log = ".\robologs"
-
-$max_jobs = 2
 $tstart = get-date
 
 if((Test-Path -Path $src ))
