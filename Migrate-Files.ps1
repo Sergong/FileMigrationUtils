@@ -28,7 +28,7 @@ if((Test-Path -Path $src ))
                 param($name, $src, $dest, $log)
                 $log += "\$name-$(get-date -f yyyy-MM-dd-HH-mm-ss).log"
                 Write-Host "Starting Copy of $src\$name..." -ForegroundColor Yellow
-				robocopy "$src\$name" "$dest\$name" /MIR /COPYALL /SECFIX /R:1 /W:5 /ZB /MT:4 /LOG+:"$log"
+				robocopy "$src\$name" "$dest\$name" /FFT /MIR /COPYALL /SECFIX /R:1 /W:5 /ZB /MT:4 /LOG+:"$log"
                 Write-Host "$src\$name completed" -ForegroundColor Green
 			}
 			$j = Get-Job -State "Running"
