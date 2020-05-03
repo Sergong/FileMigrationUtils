@@ -10,10 +10,23 @@ param(
     $SampleSize = 100
 )
 
-$csv = Import-Csv $CsvPath
+Function AddToLog {
+    param (
+        $Source,
+        $Status
+    )
 
+    $tempObj = [PSCustomObject]@{
+        Source = $Source
+        Status = $Status
+    }
+    Return $tempObj
+}
+
+$csv = Import-Csv $CsvPath
 $LogObj = @()
 $Tot = $csv.Count
+
 if($SampleSize -gt $Tot){
     write-host "SampleSize is larger than the total nr of entries in $resultFile. The setting it to $Tot."
     $SampleSet = $csv
@@ -30,20 +43,11 @@ $SampleSet | %{
         $orgACL = get-ACL -path $_.source
         $destACL = Get-Acl -Path $_.destination
         if( $orgACL.Sddl -eq $destACL.Sddl){
-            $LogObj += [PSCustomObject]@{
-                Source = $_.source
-                Status = "OK"
-            }
+            $LogObj += AddToLog -Source $_.source -Status "OK"
         } elseif ($null -eq $destACL){
-            $LogObj += [PSCustomObject]@{
-                Source = $_.source
-                Status = "Not Found"
-            }
+            $LogObj += AddToLog -Source $_.source -Status "Not Found"
         } elseif ($orgACL.Sddl -ne $destACL.Sddl){
-            $LogObj += [PSCustomObject]@{
-                Source = $_.source
-                Status = "ACL different"
-            }
+            $LogObj += AddToLog -Source $_.source -Status "ACL different"
         }
     }
     Catch{
@@ -53,6 +57,7 @@ $SampleSet | %{
     
     $c++
 }
+
 # Output Exceptions if there are any
 $OutCsv = $LogObj | where status -ne "OK" 
 if($Null -ne $OutCsv){
