@@ -1,6 +1,6 @@
 <#
 
-    Build a CSV file for ACL-Check
+    Build a CSV file for ACL-Check - Superfluous....
 
 #>
 param(
@@ -12,12 +12,8 @@ param(
 )
 $ErrorLog = ".\Build-Csv-Error.log"
 # Strip trailing '\' if it is passed along
-if($src.Substring($src.Length -1) -eq "\"){
-    $src = $src.Substring(0,$src.Length -1)
-}
-if($dst.Substring($dst.Length -1) -eq "\"){
-    $dst = $dst.Substring(0,$dst.Length -1)
-}
+if($src.EndsWith("\")){ $src = $src.Substring(0,$src.Length -1) }
+if($dst.EndsWith("\")){ $dst = $dst.Substring(0,$dst.Length -1) }
 
 write-host "Gathering Source Paths..." -ForegroundColor Yellow
 $srcPaths = gci $src -Recurse -ErrorVariable +ErrVar -ErrorAction SilentlyContinue
@@ -36,7 +32,7 @@ $srcPaths | %{
         Source = $_.FullName
         Destination = $_.FullName.Replace($src,$dst)
     }
-    $csv.Add($record)
+    $null = $csv.Add($record)
     $c++
 }
 write-host "Exporting to $outFile..." -ForegroundColor Yellow
