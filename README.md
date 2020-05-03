@@ -1,17 +1,20 @@
 # Purpose
 This repo is a collection of PowerShell Scripts to aid with a File Server Migration.
 
-Currently there are 3 Scripts.
+Currently there are 3 Main Scripts.
 
-## 1. Copy-Files.ps1
+## 1. Migrate-Files.ps1
 This script is a wrapper for Robocopy with some sane switches already configured. The script
 requires a source path and a destination path and it will then mirror the source path in 
-the destination path and copy all NTFS permission along with it.
+the destination path and copy all NTFS permission along with it. It will do this multithreaded according to
+the number of Max Jobs can run at the same time. It will start a job for each sub directory under source path.
+There are 3 parameters:
 
-## 2. Build-Csv.ps1
-This script is a co-hort for the 3rd script (Acl-Check.ps1). It generates a CSV file that can then be used
-as an input for Acl-Check.ps1. It requires a source and destination path (same as used for the 1st script) 
-and an optional -outfile parameter (which by default is set to acl-check-input.csv in the current directory)
+
+## 2. Check-Files.ps1
+This script checks that source and destination have the same number of files/directories in them as a safety check.
+It then calls the 3rd script to check the ACLs of a subset of files.
+There are 4 parameters:
 
 ## 3. Acl-Check.ps1
 This script checks if the ACL's on the destination files/directories are the same as the source.
