@@ -27,7 +27,7 @@ Function AddToLog {
     }
     Return $tempObj
 }
-
+$errVar = ""
 # strip trailing \
 if($src.EndsWith("\")){ $src = $src.Substring(0,$src.Length -1) }
 
@@ -57,8 +57,8 @@ $SampleSet | %{
     $Source = $_.FullName
     $Destination = $_.FullName.Replace($src,$dst)
     Try {
-        $orgACL = get-ACL -path $Source
-        $destACL = Get-Acl -Path $Destination
+        $orgACL = get-ACL -path $Source -ea Stop
+        $destACL = Get-Acl -Path $Destination -ea Stop
         if( $orgACL.Sddl -eq $destACL.Sddl){
             $LogObj += AddToLog -Source $_.source -Status "OK"
         } elseif ($null -eq $destACL){
@@ -85,5 +85,5 @@ if($Null -ne $OutCsv){
     write-host "Some exceptions found, please check $resultFile" -ForegroundColor Red
     $OutCsv | Export-Csv -notypeinformation -path $resultFile
 } else {
-    write-host "No exception found, All passed." -ForegroundColor Green
+    write-host "No exception found, the SHA256 checksum of all $sampleSize sampled files matched." -ForegroundColor Green
 }
