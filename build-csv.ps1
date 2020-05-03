@@ -22,7 +22,7 @@ if($dst.Substring($dst.Length -1) -eq "\"){
 write-host "Gathering Source Paths..." -ForegroundColor Yellow
 $srcPaths = gci $src -Recurse -ErrorVariable +ErrVar -ErrorAction SilentlyContinue
 if($null -ne $errVar){
-    $ErrorMsg = "One of more errors occurred, these could be access privilege related, please check $ErrorLog"
+    $ErrorMsg = "One or more errors occurred, these could be access privilege related, please check $ErrorLog"
     write-host $ErrorMsg -fore Red
     write-output $errVar | out-file $ErrorLog
 }
