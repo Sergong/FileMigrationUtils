@@ -21,21 +21,22 @@ Function AddToLog {
         $Status
     )
 
-    $tempObj = [PSCustomObject]@{
-        Source = $Source
-        Status = $Status
-    }
+    $tempObj = "" | select Source, Status
+    $tempObj.Source = $Source
+    $tempObj.Status = $Status
+    
     Return $tempObj
 }
-$errVar = ""
+$ErrVar = $null
 # strip trailing \
 if($src.EndsWith("\")){ $src = $src.Substring(0,$src.Length -1) }
 
 $srcPaths = gci $src -Recurse -ErrorVariable +ErrVar -ErrorAction SilentlyContinue
-if($null -ne $errVar){
+
+if($ErrVar.Count -ne 0){
     $ErrorMsg = "One or more errors occurred, these could be access privilege related, please check $ErrorLog"
     write-host $ErrorMsg -fore Red
-    write-output $errVar | out-file $ErrorLog
+    write-output $ErrVar | out-file $ErrorLog
 }
 
 $LogObj = @()
@@ -80,10 +81,10 @@ With File: $Source
 }
 
 # Output Exceptions if there are any
-$OutCsv = $LogObj | where status -ne "OK" 
+$OutCsv = $LogObj | where{$_.status -ne "OK"} 
 if($Null -ne $OutCsv){
     write-host "Some exceptions found, please check $resultFile" -ForegroundColor Red
     $OutCsv | Export-Csv -notypeinformation -path $resultFile
 } else {
-    write-host "No exception found, the SHA256 checksum of all $sampleSize sampled files matched." -ForegroundColor Green
+    write-host "No exception found, the ACLs of all $sampleSize sampled files matched." -ForegroundColor Green
 }
