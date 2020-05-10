@@ -20,9 +20,9 @@ if((Test-Path -Path $src ))
 	if(!(Test-Path -Path $log )){New-Item -ItemType directory -Path $log}
 	if((Test-Path -Path $dest)){
 		robocopy "$src" "$dest"
-		$files = Get-ChildItem -Path $src -Directory
+		$TopLevelFolders = Get-ChildItem -Path $src | where{$_.Mode -match '^d.*'}
 		
-		$files | %{
+		$TopLevelFolders | %{
 			$ScriptBlock = {
                 param($name, $src, $dest, $log)
                 $log += "\$name-$(get-date -f yyyy-MM-dd-HH-mm-ss).log"
