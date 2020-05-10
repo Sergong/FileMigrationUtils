@@ -9,7 +9,7 @@ param(
 	$max_jobs = 2
 )
 # Strip trailing \
-if($src.EndsWith("\")){ $src = $src.Substring(0,$src.Length -1) }
+if($src.EndsWith("\") -and $src.length -gt 3){ $src = $src.Substring(0,$src.Length -1) }
 if($dest.EndsWith("\")){ $dest = $dest.Substring(0,$dest.Length -1) }
 
 $log = ".\robologs"
@@ -20,9 +20,9 @@ if((Test-Path -Path $src ))
 	if(!(Test-Path -Path $log )){New-Item -ItemType directory -Path $log}
 	if((Test-Path -Path $dest)){
 		robocopy "$src" "$dest"
-		$TopLevelFolders = Get-ChildItem -Path $src | where{$_.Mode -match '^d.*'}
+		$files = Get-ChildItem -Path $src | where{$_.mode -match '^d.*'}
 		
-		$TopLevelFolders | %{
+		$files | %{
 			$ScriptBlock = {
                 param($name, $src, $dest, $log)
                 $log += "\$name-$(get-date -f yyyy-MM-dd-HH-mm-ss).log"
