@@ -25,6 +25,8 @@ Function AddToLog {
     Return $tempObj
 }
 
+
+
 $ErrorLog = ".\Check-Files-Error.log"
 
 # Strip trailing '\' if it is passed along
@@ -60,7 +62,7 @@ if($srcPaths.Count -ne $dstPaths.Count){
 
 $LogObj = @()
 
-$SampleSet = $srcPaths | where{ $_.attributes -ne 'Directory'} | Get-Random -Count $SampleSize
+$SampleSet = $srcPaths | Where-Object{ $_.attributes -ne 'Directory'} | Get-Random -Count $SampleSize
 
 $c = 1
 foreach($file in $SampleSet){
@@ -85,7 +87,7 @@ foreach($file in $SampleSet){
 }
 
 # Output Exceptions if there are any
-$OutCsv = $LogObj | where{$_.status -ne "OK"} 
+$OutCsv = $LogObj | Where-Object{$_.status -ne "OK"} 
 $OutCsv
 if($Null -ne $OutCsv){
     write-host "Some exceptions found, please check $OutFile" -ForegroundColor Red
