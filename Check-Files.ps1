@@ -25,6 +25,8 @@ Function AddToLog {
     Return $tempObj
 }
 
+
+
 $ErrorLog = ".\Check-Files-Error.log"
 
 # Strip trailing '\' if it is passed along
@@ -59,10 +61,7 @@ if($srcPaths.Count -ne $dstPaths.Count){
 .\acl-check.ps1 -src $src -dst $dst -SampleSize $SampleSize
 
 
-<# Check file Hashes
-
-# No longer needed as Acl-Check.ps1 does just that...
-
+# Check file Hashes
 $LogObj = @()
 
 $SampleSet = $srcPaths | Get-Random -Count $SampleSize
