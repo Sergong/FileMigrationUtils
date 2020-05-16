@@ -23,7 +23,7 @@ if((Test-Path -Path $src ))
 	if((Test-Path -Path $dest)){
 		robocopy "$src" "$dest"
 		$files = Get-ChildItem -Path $src | where{$_.mode -match '^d.*'}
-		
+
 		$files | %{
 			$ScriptBlock = {
                 param($name, $src, $dest, $log)
@@ -33,7 +33,7 @@ if((Test-Path -Path $src ))
                 Write-Host "$src\$name completed" -ForegroundColor Green
 			}
 			$j = Get-Job -State "Running"
-			while ($j.count -ge $max_jobs) 
+			while ($j.count -ge $max_jobs)
 			{
                 Start-Sleep -Seconds 1
                 $j = Get-Job -State "Running"
@@ -45,15 +45,15 @@ if((Test-Path -Path $src ))
 		}
 
 		While (Get-Job -State "Running") { Start-Sleep 2 }
-		Remove-Job -State "Completed" 
+		Remove-Job -State "Completed"
 		  Get-Job | Write-host
 
 		$tend = get-date
-		
+
 		Write-host "Completed copy"
 		Write-host "From: $src"
 		Write-host "To: $Dest"
 		new-timespan -start $tstart -end $tend
-		
+
 	} else {echo 'invalid Destination'}
 }else {echo 'invalid Source'}

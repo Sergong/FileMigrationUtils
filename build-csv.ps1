@@ -14,14 +14,14 @@ param(
 #######   Start Functions ########
 function Export-UTF8CSV {
     param (
-        [Parameter(Mandatory=$true,ValueFromPipeline)]
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [psobject]
         $inputObj,
         [Parameter(Mandatory=$true)]
         $Path
     )
     # Export Header
-    $fields = $inputObj | Get-Member | where MemberType -Match "Property"
+    $fields = $inputObj | Get-Member | where{$_.MemberType -eq "Property" -or $_.MemberType -eq "NoteProperty"}
     $newLine = ""
     foreach($field in $fields){
         $NewLine += "`"$($field.Name)`","
@@ -54,10 +54,11 @@ if($null -ne $errVar){
     write-output $errVar | out-file $ErrorLog
 }
 
-$Tot = $srcFiles.Count
+
 $csv = New-Object System.Collections.ArrayList
 $c = 1
 $SampleSet = $srcFiles | Where-Object{ $_.attributes -ne 'Directory'} | Get-Random -Count $SampleSize
+$Tot = $SampleSet.Count
 $SampleSet | %{
     Write-Progress  -Activity "Processing $($_.FullName)" -PercentComplete (100 * ($c / $Tot)) -Status "Building source path file..."
     $srcFile = $_.FullName
@@ -77,4 +78,4 @@ write-host "Exporting to $outFile..." -ForegroundColor Yellow
 
 # write UTF8 CSV file
 # write header out
-$csv | Export-UTF8CSV -Path $outFile
+Export-UTF8CSV -Path $outFile -inputObj $csv

@@ -55,6 +55,6 @@ if($Null -ne $OutCsv){
     write-host "Some exceptions found, please check $OutFile" -ForegroundColor Red
     $OutCsv| Export-Csv -notypeinformation -path $OutFile
 } else {
-    write-host "No exception found, the md5 checksum of all $sampleSize sampled files matched." -ForegroundColor Green
+    write-host "No exception found, the md5 checksum of all $($SampleSet.Count) sampled files matched." -ForegroundColor Green
 }
 

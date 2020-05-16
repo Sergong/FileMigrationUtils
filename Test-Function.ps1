@@ -6,14 +6,14 @@
 
 function Export-UTF8CSV {
     param (
-        [Parameter(Mandatory=$true,ValueFromPipeline)]
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [psobject]
         $inputObj,
         [Parameter(Mandatory=$true)]
         $Path
     )
     # Export Header
-    $fields = $inputObj | Get-Member | where MemberType -Match "Property"
+    $fields = $inputObj | Get-Member | where{$_.MemberType -eq "Property" -or $_.MemberType -eq "NoteProperty"}
     $newLine = ""
     foreach($field in $fields){
         $NewLine += "`"$($field.Name)`","

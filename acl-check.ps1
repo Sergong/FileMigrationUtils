@@ -64,5 +64,5 @@ if($Null -ne $OutCsv){
     write-host "Some exceptions found, please check $resultFile" -ForegroundColor Red
     $OutCsv | Export-Csv -notypeinformation -path $resultFile
 } else {
-    write-host "No exception found, the ACLs of all $sampleSize sampled files matched." -ForegroundColor Green
+    write-host "No exception found, the ACLs of all $Tot sampled files matched." -ForegroundColor Green
 }
