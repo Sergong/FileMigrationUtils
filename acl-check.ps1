@@ -59,7 +59,7 @@ With File: $Source
 }
 
 # Output Exceptions if there are any
-$OutCsv = $LogObj | where{$_.status -ne "OK"} 
+$OutCsv = $LogObj | where{$_.status -ne "OK"}
 if($Null -ne $OutCsv){
     write-host "Some exceptions found, please check $resultFile" -ForegroundColor Red
     $OutCsv | Export-Csv -notypeinformation -path $resultFile

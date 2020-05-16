@@ -21,7 +21,7 @@ Function AddToLog {
     $tempObj = "" | select Source, Status
     $tempObj.Source = $Source
     $tempObj.Status = $Status
-    
+
     Return $tempObj
 }
 
@@ -87,7 +87,7 @@ foreach($file in $SampleSet){
 }
 
 # Output Exceptions if there are any
-$OutCsv = $LogObj | Where-Object{$_.status -ne "OK"} 
+$OutCsv = $LogObj | Where-Object{$_.status -ne "OK"}
 $OutCsv
 if($Null -ne $OutCsv){
     write-host "Some exceptions found, please check $OutFile" -ForegroundColor Red
