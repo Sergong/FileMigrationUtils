@@ -3,8 +3,15 @@
     This contains handy robocopy tricks
 
 #>
-
-function Calculate-FolderSize() {
+param(
+    [Parameter(Mandatory=$true)]
+    [string]
+    $folder,
+    [Parameter(Mandatory=$false)]
+    [string]
+    $Log
+)
+function Get-FolderSize() {
     param(
         # Parameter help description
         [Parameter(Mandatory=$true)]
@@ -17,12 +24,13 @@ function Calculate-FolderSize() {
     Return [math]::Round(($totbytes / 1GB ),2)
 }
 
+robocopy $folder $env:temp /zb /e /l /r:1 /w:1 /ndl /nfl /bytes /np /njh /log:$Log
 
 # write-host "$folder is $() GB in size"
 
 <# send the bytes to log file
 
-robocopy "large path name" $env:temp /zb /e /l /r:1 /w:1 /ndl /nfl /bytes /np /njh /log:size.log
+
 
 Switches Used:
 /zb     Use restartable mode, if access denied use Backup mode

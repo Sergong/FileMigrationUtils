@@ -23,8 +23,8 @@ if($null -ne $errVar){
     write-output $errVar | out-file $ErrorLog
 }
 
-$Tot = $srcPaths.Count
-$csv = [System.Collections.ArrayList]@()
+$Tot = $srcFiles.Count
+$csv = New-Object System.Collections.ArrayList
 $c = 1
 $SampleSet = $srcFiles | Where-Object{ $_.attributes -ne 'Directory'} | Get-Random -Count $SampleSize
 $SampleSet | %{
@@ -33,12 +33,12 @@ $SampleSet | %{
     $srcTemp = (.\fciv -md5 $srcfile)    #(Get-FileHash $srcFile).hash
 	$srcTemp = $srcTemp[$srcTemp.Count-1] -match '(^[a-z0-9]+)\s.*'
 	$srcHash = $Matches[1]
-    $record = [PSCustomObject]@{
-        FullName = $_.FullName
-        ACL = $(Get-Acl -Path $_.FullName -ea Stop).Sddl
-        Hash = $srcHash
+    $record = New-Object -TypeName PSObject -Property @{
+        "FullName" = $_.FullName
+        "ACL" = $(Get-Acl -Path $_.FullName -ea Stop).Sddl
+        "Hash" = $srcHash
     }
-    $null = $csv.Add($record)
+    [void]$csv.Add($record)
     $c++
 }
 write-host "Exporting to $outFile..." -ForegroundColor Yellow
