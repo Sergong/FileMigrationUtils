@@ -1,17 +1,13 @@
 <#
 
     Script to test ACLs of directory paths to make sure the source is the same as the destination
+    Run on the destination
 
 #>
 param(
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path -Path $_})]
-    $src,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path -Path $_})]
-    $dst,
+    [Parameter(Mandatory=$false)]
+    $InputCSV =".\check-input.csv",
     $resultFile = ".\acl-exceptions.csv",
-    $SampleSize = 100,
     $ErrorLog = ".\Acl-Check-Error.log"
 )
 
@@ -24,48 +20,30 @@ Function AddToLog {
     $tempObj = "" | select Source, Status
     $tempObj.Source = $Source
     $tempObj.Status = $Status
-    
+
     Return $tempObj
 }
-$ErrVar = $null
-# strip trailing \
-if($src.EndsWith("\")){ $src = $src.Substring(0,$src.Length -1) }
 
-$srcPaths = gci $src -Recurse -ErrorVariable +ErrVar -ErrorAction SilentlyContinue
+$srcFiles = Import-Csv -Path $InputCSV
 
-if($ErrVar.Count -ne 0){
-    $ErrorMsg = "One or more errors occurred, these could be access privilege related, please check $ErrorLog"
-    write-host $ErrorMsg -fore Red
-    write-output $ErrVar | out-file $ErrorLog
-}
 
 $LogObj = @()
-$Tot = $srcPaths.Count
-
-if($SampleSize -gt $Tot){
-    write-host "SampleSize is larger than the total nr of entries in $resultFile. Setting it to $Tot."
-    $SampleSet = $srcPaths
-    $SampleSize = $Tot
-} else {
-    # Build a Sample Set 
-    $SampleSet = $srcPaths | Get-Random -Count $SampleSize
-}
+$Tot = $srcFiles.Count
 
 # Iterate through the Set
 $c = 1
-$SampleSet | %{
-    Write-Progress -Activity "Processing $($_.FullName)" -PercentComplete (100 * ($c / $SampleSize)) -Status "Comparing $SampleSize Source and Destination path ACLs"
+Foreach($srcFile in $srcFiles){
+    Write-Progress -Activity "Processing $($_.FullName)" -PercentComplete (100 * ($c / $Tot)) -Status "Comparing $Tot Source and Destination path ACLs"
     $Source = $_.FullName
-    $Destination = $_.FullName.Replace($src,$dst)
     Try {
-        $orgACL = get-ACL -path $Source -ea Stop
-        $destACL = Get-Acl -Path $Destination -ea Stop
-        if( $orgACL.Sddl -eq $destACL.Sddl){
-            $LogObj += AddToLog -Source $_.source -Status "OK"
-        } elseif ($null -eq $destACL){
-            $LogObj += AddToLog -Source $_.source -Status "Not Found"
-        } elseif ($orgACL.Sddl -ne $destACL.Sddl){
-            $LogObj += AddToLog -Source $_.source -Status "ACL different"
+        $orgSddl = $_.ACL
+        $destSddl = (Get-Acl -Path $_.FullName -ea Stop).Sddl
+        if( $orgSddl -eq $destSddl){
+            $LogObj += AddToLog -Source $_.FullName -Status "OK"
+        } elseif ($null -eq $destSddl){
+            $LogObj += AddToLog -Source $_.FullName -Status "Not Found"
+        } elseif ($orgSddl -ne $destSddl){
+            $LogObj += AddToLog -Source $_.FullName -Status "ACL different"
         }
     }
     Catch{

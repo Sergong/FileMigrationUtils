@@ -22,6 +22,21 @@ function Calculate-FolderSize() {
 
 <# send the bytes to log file
 
-robocopy "large path name" "c:\temp" /zb /e /l /r:1 /w:1 /ndl /nfl /bytes /np /njh /log:size.log
+robocopy "large path name" $env:temp /zb /e /l /r:1 /w:1 /ndl /nfl /bytes /np /njh /log:size.log
+
+Switches Used:
+/zb     Use restartable mode, if access denied use Backup mode
+/e      Copy subdirectories, including Empty directories
+/l      Specifies that files are only listed (not copied, deleted or time stanped)
+/r:1    Number of retries
+/w:1    Wait time in seconds
+/nfl    File names are not logged
+/ndl    Directory names are not logged
+/nc     File Classes are not logged
+/fp     Includes full path names of files in output
+/bytes  Print sizes as bytes
+/np     Progress of the copying operation will not be displayed
+/hjh    No job header is displayed
+/log:   File to Log to
 
 #>
