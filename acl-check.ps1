@@ -33,17 +33,17 @@ $Tot = $srcFiles.Count
 # Iterate through the Set
 $c = 1
 Foreach($srcFile in $srcFiles){
-    Write-Progress -Activity "Processing $($_.FullName)" -PercentComplete (100 * ($c / $Tot)) -Status "Comparing $Tot Source and Destination path ACLs"
-    $Source = $_.FullName
+    $Source = $srcFile.FullName
+    Write-Progress -Activity "Processing $Source" -PercentComplete (100 * ($c / $Tot)) -Status "Comparing $Tot Source and Destination path ACLs"
     Try {
-        $orgSddl = $_.ACL
-        $destSddl = (Get-Acl -Path $_.FullName -ea Stop).Sddl
+        $orgSddl = $srcFile.ACL
+        $destSddl = (Get-Acl -Path $Source -ea Stop).Sddl
         if( $orgSddl -eq $destSddl){
-            $LogObj += AddToLog -Source $_.FullName -Status "OK"
+            $LogObj += AddToLog -Source $Source -Status "OK"
         } elseif ($null -eq $destSddl){
-            $LogObj += AddToLog -Source $_.FullName -Status "Not Found"
+            $LogObj += AddToLog -Source $Source -Status "Not Found"
         } elseif ($orgSddl -ne $destSddl){
-            $LogObj += AddToLog -Source $_.FullName -Status "ACL different"
+            $LogObj += AddToLog -Source $Source -Status "ACL different"
         }
     }
     Catch{

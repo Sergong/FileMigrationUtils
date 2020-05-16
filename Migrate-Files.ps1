@@ -11,8 +11,10 @@ param(
 # Strip trailing \
 if($src.EndsWith("\") -and $src.length -gt 3){ $src = $src.Substring(0,$src.Length -1) }
 if($dest.EndsWith("\")){ $dest = $dest.Substring(0,$dest.Length -1) }
+$tmp = $src.Split("\")
+$sourcePath = $tmp[$tmp.Count-1]
 
-$log = ".\robologs"
+$log = ".\robologs-$sourcePath-$(get-date -f yyyy-MM-dd-HH-mm-ss)"
 $tstart = get-date
 
 if((Test-Path -Path $src ))

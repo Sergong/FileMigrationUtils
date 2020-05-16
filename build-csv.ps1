@@ -11,6 +11,37 @@ param(
     $SampleSize = 1000,
     $outFile = ".\check-input.csv"
 )
+#######   Start Functions ########
+function Export-UTF8CSV {
+    param (
+        [Parameter(Mandatory=$true,ValueFromPipeline)]
+        [psobject]
+        $inputObj,
+        [Parameter(Mandatory=$true)]
+        $Path
+    )
+    # Export Header
+    $fields = $inputObj | Get-Member | where MemberType -Match "Property"
+    $newLine = ""
+    foreach($field in $fields){
+        $NewLine += "`"$($field.Name)`","
+    }
+    $newLine = $newLine.Substring(0,$newLine.Length-1)
+    $newLine | Out-File -FilePath $Path -Encoding utf8
+
+    # Export Fields
+    foreach($line in $inputObj){
+        $newLine = ""
+        foreach($field in $fields){
+            $NewLine += "`"$($line.$($field.Name))`","
+        }
+        $newLine = $newLine.Substring(0,$newLine.Length-1)
+        $newLine | Out-File -FilePath $Path -Encoding utf8 -Append
+    }
+}
+#######   End Functions  ##########
+
+
 $ErrorLog = ".\Build-Csv-Error.log"
 # Strip trailing '\' if it is passed along
 if($src.EndsWith("\")){ $src = $src.Substring(0,$src.Length -1) }
@@ -28,8 +59,8 @@ $csv = New-Object System.Collections.ArrayList
 $c = 1
 $SampleSet = $srcFiles | Where-Object{ $_.attributes -ne 'Directory'} | Get-Random -Count $SampleSize
 $SampleSet | %{
-    Write-Progress  -Activity "Processing $($_.FullName)" -PercentComplete (100 * ($c / $Tot)) -Status "Creating desitnation paths..."
-    $srcFile = $file.FullName
+    Write-Progress  -Activity "Processing $($_.FullName)" -PercentComplete (100 * ($c / $Tot)) -Status "Building source path file..."
+    $srcFile = $_.FullName
     $srcTemp = (.\fciv -md5 $srcfile)    #(Get-FileHash $srcFile).hash
 	$srcTemp = $srcTemp[$srcTemp.Count-1] -match '(^[a-z0-9]+)\s.*'
 	$srcHash = $Matches[1]
@@ -42,4 +73,8 @@ $SampleSet | %{
     $c++
 }
 write-host "Exporting to $outFile..." -ForegroundColor Yellow
-$csv | Export-Csv -NoTypeInformation -Path $outFile
+#$csv | Export-Csv -NoTypeInformation -Path $outFile # Doesn't work with extended character set...
+
+# write UTF8 CSV file
+# write header out
+$csv | Export-UTF8CSV -Path $outFile
